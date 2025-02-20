@@ -1,22 +1,25 @@
 pipeline {
     agent any
 
-environment {
-    JAVA_HOME = "${tool 'JDK17'}"
-    PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
-}
+    environment {
+        JAVA_HOME = "C:/Program Files/Eclipse Adoptium/jdk-21.0.6.7-hotspot"
+        PATH = "${env.JAVA_HOME}/bin;C:/Program Files/Apache/maven/bin;${env.PATH}"
+    }
 
+    triggers {
+        cron('H/3 * * * 4') // Runs every 3 minutes on Thursdays
+    }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/khaleedcodes/spring-petclinic.git'
+                checkout scm
             }
         }
 
         stage('Build') {
             steps {
-                bat './mvnw clean package'
+                bat '.\\mvnw clean package'
             }
             post {
                 success {
@@ -27,7 +30,7 @@ environment {
 
         stage('Test & Coverage') {
             steps {
-                bat './mvnw test'
+                bat '.\\mvnw test'
             }
             post {
                 always {
@@ -35,9 +38,5 @@ environment {
                 }
             }
         }
-    }
-
-    triggers {
-        cron('H/3 * * 4 *')
     }
 }
